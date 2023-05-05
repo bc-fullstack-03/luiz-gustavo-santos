@@ -1,6 +1,5 @@
 package com.parrot.backend.api;
 
-import com.parrot.backend.entities.User;
 import com.parrot.backend.services.user.CreateUserRequest;
 import com.parrot.backend.services.user.UserResponse;
 import com.parrot.backend.services.user.IUserService;
@@ -36,11 +35,12 @@ public class UserController {
   @GetMapping("/{id}")
   public ResponseEntity<UserResponse> finById(@PathVariable UUID id) {
     var response = userService.findById(id);
+
     return ResponseEntity.ok().body(response);
   }
 
   @GetMapping("/all")
-  public ResponseEntity<List<User>> findAll() {
+  public ResponseEntity<List<UserResponse>> findAll() {
     return  ResponseEntity.ok().body(userService.findAll());
   }
   @PutMapping("/{id}")
@@ -53,6 +53,7 @@ public class UserController {
   @DeleteMapping("/{id}")
   public ResponseEntity<String> delete(@PathVariable UUID id) {
     userService.delete(id);
+
     return ResponseEntity.ok().body("");
   }
 }

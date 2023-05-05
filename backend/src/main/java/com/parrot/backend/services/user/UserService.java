@@ -5,6 +5,7 @@ import com.parrot.backend.api.exceptions.UserAlreadyExistsException;
 import com.parrot.backend.data.IUserRepository;
 import com.parrot.backend.entities.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,16 +16,19 @@ import java.util.UUID;
 public class UserService implements IUserService {
   @Autowired
   private IUserRepository userRepository;
+  @Autowired
+  private PasswordEncoder passwordEncoder;
 
   @Transactional
   public void create(CreateUserRequest request) {
-    var userAlreadyExists = userRepository.findUserByEmail(request.email);
-    if(userAlreadyExists.isPresent()) {
+    if(userRepository.findUserByEmail(request.email).isPresent()) {
       throw new UserAlreadyExistsException("User already exists");
     }
 
-    var user = new User(request.name, request.email, request.password);
+    var user = new User(request.name, request.email);
+    var passwordHash = passwordEncoder.encode(request.password);
 
+    user.setPassword(passwordHash);
     userRepository.save(user);
   }
 
@@ -40,8 +44,8 @@ public class UserService implements IUserService {
     return new UserResponse(user.getId(), user.getName(), user.getEmail());
   }
 
-  public List<User> findAll() {
-    return userRepository.findAll();
+  public List<UserResponse> findAll() {
+    return userRepository.findAllUsers();
   }
 
   @Transactional
