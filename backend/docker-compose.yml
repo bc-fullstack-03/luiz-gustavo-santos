@@ -4,4 +4,4 @@ services:
     image: mongo:latest
     container_name: "mongodb"
     ports:
-      - 27070:27017
+      - 27017:27017
