@@ -4,10 +4,12 @@ import com.parrot.backend.api.exceptions.NotFoundException;
 import com.parrot.backend.api.exceptions.UserAlreadyExistsException;
 import com.parrot.backend.data.IUserRepository;
 import com.parrot.backend.entities.User;
+import com.parrot.backend.services.fileUpload.IFileUploadService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
@@ -18,6 +20,8 @@ public class UserService implements IUserService {
   private IUserRepository userRepository;
   @Autowired
   private PasswordEncoder passwordEncoder;
+  @Autowired
+  private IFileUploadService fileUploadService;
 
   @Transactional
   public void create(CreateUserRequest request) {
@@ -35,13 +39,13 @@ public class UserService implements IUserService {
   public UserResponse findByEmail(String email) {
     var user = userRepository.findUserByEmail(email).orElseThrow(() -> new NotFoundException("User not found"));
 
-    return new UserResponse(user.getId(), user.getName(), user.getEmail());
+    return new UserResponse(user.getId(), user.getName(), user.getEmail(), user.getPhotoUrl());
   }
 
   public UserResponse findById(UUID id) {
     var user = userRepository.findById(id).orElseThrow(() -> new NotFoundException("User not found"));
 
-    return new UserResponse(user.getId(), user.getName(), user.getEmail());
+    return new UserResponse(user.getId(), user.getName(), user.getEmail(), user.getPhotoUrl());
   }
 
   public List<UserResponse> findAll() {
@@ -56,12 +60,27 @@ public class UserService implements IUserService {
 
     userRepository.save(user);
 
-    return new UserResponse(user.getId(), user.getName(), user.getEmail());
+    return new UserResponse(user.getId(), user.getName(), user.getEmail(), user.getPhotoUrl());
   }
 
   @Transactional
   public void delete(UUID id) {
     findById(id);
     userRepository.deleteById(id);
+  }
+
+  @Transactional
+  public void uploadPhoto(UUID id, MultipartFile photo) throws Exception {
+    var user = userRepository.findById(id).orElseThrow(() -> new NotFoundException("User not found"));
+    var photoUrl = "";
+
+    try {
+      var fileName = user.getId() + "." + photo.getOriginalFilename().substring(photo.getOriginalFilename().lastIndexOf(".") + 1);
+      photoUrl = fileUploadService.upload(photo, fileName);
+    } catch (Exception e) {
+      throw new Exception(e.getMessage());
+    }
+    user.setPhotoUrl(photoUrl);
+    userRepository.save(user);
   }
 }

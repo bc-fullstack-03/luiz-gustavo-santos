@@ -13,12 +13,12 @@ public class User {
   private String name;
   private String email;
   private String password;
+  private String photoUrl;
 
   public User(String name, String email) {
     this.setId();
     this.name = name;
     this.email = email;
-    this.password = password;
   }
 
   protected void setId() {

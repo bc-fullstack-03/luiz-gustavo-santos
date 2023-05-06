@@ -5,3 +5,17 @@ services:
     container_name: "mongodb"
     ports:
       - 27017:27017
+  localstack:
+    image: localstack/localstack
+    container_name: parrot_localstack
+    ports:
+      - 4566:4566
+      - 4510-4559:4510-4559
+      - 8055:8080
+    environment:
+      - SERVICES=s3
+      - DEBUG=1
+      - DATA_DIR=/tmp/localstack/data
+    volumes:
+      - ./tmp/localstack:/tmp/localstack
+      - /var/run/docker.sock:/var/run/docker.sock
