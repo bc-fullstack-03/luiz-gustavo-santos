@@ -55,9 +55,9 @@ public class UserController {
   }
 
   @PostMapping("/photo/upload")
-  public ResponseEntity<String> uploadPhoto(@RequestParam("id") UUID id, @RequestParam("photo") MultipartFile photo) {
+  public ResponseEntity<String> uploadPhoto(@RequestParam("photo") MultipartFile photo) {
     try {
-      userService.uploadPhoto(id, photo);
+      userService.uploadPhoto(photo);
       return ResponseEntity.ok().body("");
     } catch (Exception e) {
       return ResponseEntity.badRequest().body(e.getMessage());

@@ -6,6 +6,7 @@ import com.parrot.backend.data.IUserRepository;
 import com.parrot.backend.entities.User;
 import com.parrot.backend.services.fileUpload.IFileUploadService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -70,8 +71,8 @@ public class UserService implements IUserService {
   }
 
   @Transactional
-  public void uploadPhoto(UUID id, MultipartFile photo) throws Exception {
-    var user = userRepository.findById(id).orElseThrow(() -> new NotFoundException("User not found"));
+  public void uploadPhoto(MultipartFile photo) throws Exception {
+    var user = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
     var photoUrl = "";
 
     try {
@@ -82,5 +83,13 @@ public class UserService implements IUserService {
     }
     user.setPhotoUrl(photoUrl);
     userRepository.save(user);
+  }
+
+  public User getUser(String email) {
+    return userRepository.findUserByEmail(email).get();
+  }
+
+  public User getUserById(UUID id) {
+    return userRepository.findById(id).get();
   }
 }
