@@ -1,7 +1,6 @@
 package com.parrot.backend.api;
 
-import com.parrot.backend.services.post.IPostService;
-import com.parrot.backend.services.post.PostResponse;
+import com.parrot.backend.services.post.*;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -63,6 +62,31 @@ public class PostController {
   @DeleteMapping("/{id}")
   public ResponseEntity<String> delete(@PathVariable UUID id) {
     postService.delete(id);
+    return ResponseEntity.ok().body("");
+  }
+
+  @PostMapping("/comment")
+  public ResponseEntity<CommentResponse>createComment(@RequestBody @Valid CreateCommentRequest request) {
+    return ResponseEntity.status(HttpStatus.CREATED).body(postService.createComment(request));
+  }
+
+  @GetMapping("/comment")
+  public ResponseEntity<List<CommentResponse>>findAllCommentsByPost(@RequestParam(value = "postId") UUID postId) {
+    return ResponseEntity.ok().body(postService.findAllCommentsByPost(postId));
+  }
+
+  @DeleteMapping("/comment/{id}")
+  public ResponseEntity<String>deleteComment(
+      @PathVariable UUID id,
+      @RequestBody @Valid DeleteCommentRequest request
+  ) {
+    postService.deleteComment(id, request);
+    return ResponseEntity.noContent().build();
+  }
+
+  @PostMapping("/like")
+  public ResponseEntity<String>setLike(@RequestBody @Valid LikeRequest request) {
+    postService.setLike(request);
     return ResponseEntity.ok().body("");
   }
 }

@@ -3,6 +3,7 @@ package com.parrot.backend.services.post;
 import com.amazonaws.services.mq.model.ForbiddenException;
 import com.parrot.backend.api.exceptions.NotFoundException;
 import com.parrot.backend.data.IPostRepository;
+import com.parrot.backend.data.model.Comment;
 import com.parrot.backend.entities.Post;
 import com.parrot.backend.entities.User;
 import com.parrot.backend.services.fileUpload.IFileUploadService;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -45,7 +47,7 @@ public class PostService implements IPostService {
   public PostResponse findById(UUID id) {
     var post = postRepository.findById(id).orElseThrow(() -> new NotFoundException("Post not found"));
 
-    return new PostResponse(post.getId(), post.getContent(), post.getImage(), post.getUserId());
+    return new PostResponse(post);
   }
 
   public List<PostResponse> findByUserId(UUID id) {
@@ -71,7 +73,7 @@ public class PostService implements IPostService {
     }
     postRepository.save(post);
 
-    return new PostResponse(post.getId(), post.getContent(), post.getImage(), post.getUserId());
+    return new PostResponse(post);
   }
 
   @Transactional
@@ -83,6 +85,65 @@ public class PostService implements IPostService {
       throw new ForbiddenException("You don't have permission to delete this post");
     }
     postRepository.delete(post);
+  }
+
+  @Transactional
+  public CommentResponse createComment(CreateCommentRequest request) {
+    var user = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+    var post = postRepository.findById(request.postId).orElseThrow(() -> new NotFoundException("Post not found"));
+
+    if(post.getComments() == null) {
+      post.setComments(new ArrayList<>());
+    }
+    var comment = new Comment(request.comment, user.getId());
+
+    post.getComments().add(comment);
+    postRepository.save(post);
+
+    return new CommentResponse(comment);
+  }
+
+  public List<CommentResponse> findAllCommentsByPost(UUID postId) {
+    var post = postRepository.findById(postId).orElseThrow(() -> new NotFoundException("Post not found"));
+
+    return post.getComments().stream().map(CommentResponse::new).toList();
+  }
+
+  @Transactional
+  public void deleteComment(UUID id, DeleteCommentRequest request) {
+    var user = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+    var post = postRepository.findById(request.postId).orElseThrow(() -> new NotFoundException("Post not found"));
+
+    var comment = post
+        .getComments()
+        .stream()
+        .filter(item -> item.getId().equals(id))
+        .findAny()
+        .orElseThrow(() -> new NotFoundException("Comment not found"));
+
+    if(!Objects.equals(user.getId(), comment.userId)) {
+      throw new ForbiddenException("You don't have permission to delete this comment");
+    }
+
+    post.getComments().remove(comment);
+    postRepository.save(post);
+  }
+
+  public void setLike(LikeRequest request) {
+    var user = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+    var post = postRepository.findById(request.postId).orElseThrow(() -> new NotFoundException("Post not found"));
+
+    if(post.getLikes() == null) {
+      post.setLikes(new ArrayList<>());
+    }
+
+    if(post.getLikes().contains(user.getId())) {
+      post.getLikes().remove(user.getId());
+    } else {
+      post.getLikes().add(user.getId());
+    }
+
+    postRepository.save(post);
   }
 
   private String upload (MultipartFile photo, UUID postId) throws Exception {

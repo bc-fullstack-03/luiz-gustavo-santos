@@ -12,4 +12,8 @@ public interface IPostService {
   List<PostResponse> findByUserId(UUID id);
   PostResponse update(UUID id, String content, MultipartFile photo) throws Exception;
   void delete(UUID id);
+  CommentResponse createComment(CreateCommentRequest request);
+  List<CommentResponse> findAllCommentsByPost(UUID postId);
+  void deleteComment(UUID id, DeleteCommentRequest request);
+  void setLike(LikeRequest request);
 }
