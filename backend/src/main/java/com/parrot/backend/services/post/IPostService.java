@@ -15,4 +15,5 @@ public interface IPostService {
   CommentResponse createComment(CreateCommentRequest request);
   List<CommentResponse> findAllCommentsByPost(UUID postId);
   void deleteComment(UUID id, DeleteCommentRequest request);
+  void setLike(LikeRequest request);
 }

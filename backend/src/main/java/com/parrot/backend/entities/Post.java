@@ -15,6 +15,7 @@ public class Post {
   private String content;
   private String image;
   private List<Comment> comments;
+  private List<UUID> likes;
 
   public Post(String content) {
     this.setId();

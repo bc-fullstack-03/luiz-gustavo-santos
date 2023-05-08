@@ -83,4 +83,10 @@ public class PostController {
     postService.deleteComment(id, request);
     return ResponseEntity.noContent().build();
   }
+
+  @PostMapping("/like")
+  public ResponseEntity<String>setLike(@RequestBody @Valid LikeRequest request) {
+    postService.setLike(request);
+    return ResponseEntity.ok().body("");
+  }
 }

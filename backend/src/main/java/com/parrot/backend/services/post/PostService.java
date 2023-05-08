@@ -47,7 +47,7 @@ public class PostService implements IPostService {
   public PostResponse findById(UUID id) {
     var post = postRepository.findById(id).orElseThrow(() -> new NotFoundException("Post not found"));
 
-    return new PostResponse(post.getId(), post.getContent(), post.getImage(), post.getUserId(), post.getComments());
+    return new PostResponse(post);
   }
 
   public List<PostResponse> findByUserId(UUID id) {
@@ -73,7 +73,7 @@ public class PostService implements IPostService {
     }
     postRepository.save(post);
 
-    return new PostResponse(post.getId(), post.getContent(), post.getImage(), post.getUserId(), post.getComments());
+    return new PostResponse(post);
   }
 
   @Transactional
@@ -126,6 +126,23 @@ public class PostService implements IPostService {
     }
 
     post.getComments().remove(comment);
+    postRepository.save(post);
+  }
+
+  public void setLike(LikeRequest request) {
+    var user = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+    var post = postRepository.findById(request.postId).orElseThrow(() -> new NotFoundException("Post not found"));
+
+    if(post.getLikes() == null) {
+      post.setLikes(new ArrayList<>());
+    }
+
+    if(post.getLikes().contains(user.getId())) {
+      post.getLikes().remove(user.getId());
+    } else {
+      post.getLikes().add(user.getId());
+    }
+
     postRepository.save(post);
   }
 
