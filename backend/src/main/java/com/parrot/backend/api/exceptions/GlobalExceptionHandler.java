@@ -1,5 +1,6 @@
 package com.parrot.backend.api.exceptions;
 
+import com.amazonaws.services.mq.model.ForbiddenException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -32,5 +33,11 @@ public class GlobalExceptionHandler {
     });
 
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(validationError);
+  }
+
+  @ExceptionHandler(ForbiddenException.class)
+  public ResponseEntity<Object> handleForbiddenException(ForbiddenException forbiddenException) {
+    ApiException apiException = new ApiException(forbiddenException.getErrorMessage(), forbiddenException.getCause(), HttpStatus.FORBIDDEN);
+    return ResponseEntity.status(HttpStatus.FORBIDDEN).body(apiException);
   }
 }
