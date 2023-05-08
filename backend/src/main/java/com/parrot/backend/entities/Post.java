@@ -1,8 +1,10 @@
 package com.parrot.backend.entities;
 
+import com.parrot.backend.data.model.Comment;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -12,6 +14,7 @@ public class Post {
   private UUID userId;
   private String content;
   private String image;
+  private List<Comment> comments;
 
   public Post(String content) {
     this.setId();
