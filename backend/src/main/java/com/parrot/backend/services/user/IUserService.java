@@ -1,5 +1,6 @@
 package com.parrot.backend.services.user;
 
+import com.parrot.backend.data.model.Friend;
 import com.parrot.backend.entities.User;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -16,4 +17,8 @@ public interface IUserService {
   void uploadPhoto(MultipartFile photo) throws Exception;
   User getUser(String email);
   User getUserById(UUID id);
+  void follow(UUID id);
+  void unFollow(UUID id);
+  List<Friend> findAllFollowers(UUID userId);
+  List<Friend> findAllFollowings(UUID userId);
 }

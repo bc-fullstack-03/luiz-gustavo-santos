@@ -1,7 +1,9 @@
 package com.parrot.backend.services.user;
 
+import com.parrot.backend.entities.User;
 import lombok.Data;
 
+import java.util.HashSet;
 import java.util.UUID;
 @Data
 public class UserResponse {
@@ -9,11 +11,15 @@ public class UserResponse {
   public String name;
   public String email;
   private String photoUrl;
+  private HashSet<UUID> followers;
+  private HashSet<UUID> following;
 
-  public UserResponse(UUID id, String name, String email, String photoUrl) {
-    this.id = id;
-    this.name = name;
-    this.email = email;
-    this.photoUrl = photoUrl;
+  public UserResponse(User user) {
+    this.id = user.getId();
+    this.name = user.getName();
+    this.email = user.getEmail();
+    this.photoUrl = user.getPhotoUrl();
+    this.followers = user.getFollowers();
+    this.following = user.getFollowing();
   }
 }

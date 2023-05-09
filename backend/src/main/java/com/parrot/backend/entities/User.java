@@ -4,6 +4,7 @@ import lombok.Data;
 
 import org.springframework.data.annotation.Id;
 
+import java.util.HashSet;
 import java.util.UUID;
 
 @Data
@@ -14,6 +15,8 @@ public class User {
   private String email;
   private String password;
   private String photoUrl;
+  private HashSet<UUID> followers = new HashSet<>();
+  private HashSet<UUID> following = new HashSet<>();
 
   public User(String name, String email) {
     this.setId();
