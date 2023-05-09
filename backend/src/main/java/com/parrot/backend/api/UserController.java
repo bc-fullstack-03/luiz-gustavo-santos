@@ -1,5 +1,6 @@
 package com.parrot.backend.api;
 
+import com.parrot.backend.data.model.Friend;
 import com.parrot.backend.services.user.CreateUserRequest;
 import com.parrot.backend.services.user.UserResponse;
 import com.parrot.backend.services.user.IUserService;
@@ -62,5 +63,29 @@ public class UserController {
     } catch (Exception e) {
       return ResponseEntity.badRequest().body(e.getMessage());
     }
+  }
+
+  @PostMapping("/friend/follow/{id}")
+  public ResponseEntity<String>follow(@PathVariable UUID id) {
+    userService.follow(id);
+    return ResponseEntity.status(HttpStatus.CREATED).body("");
+  }
+
+  @DeleteMapping("/friend/unfollow/{id}")
+  public ResponseEntity<String> unFollow(@PathVariable UUID id) {
+    userService.unFollow(id);
+    return ResponseEntity.ok().body("");
+  }
+
+  @GetMapping("/friend/followers/{userId}")
+  public ResponseEntity<List<Friend>> findAllFollowers(@PathVariable UUID userId) {
+    var response = userService.findAllFollowers(userId);
+    return ResponseEntity.ok().body(response);
+  }
+
+  @GetMapping("/friend/followings/{userId}")
+  public ResponseEntity<List<Friend>> findAllFollowings(@PathVariable UUID userId) {
+    var response = userService.findAllFollowings(userId);
+    return ResponseEntity.ok().body(response);
   }
 }

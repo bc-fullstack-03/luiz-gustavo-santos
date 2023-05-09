@@ -3,9 +3,11 @@ package com.parrot.backend.services.user;
 import com.parrot.backend.api.exceptions.NotFoundException;
 import com.parrot.backend.api.exceptions.UserAlreadyExistsException;
 import com.parrot.backend.data.IUserRepository;
+import com.parrot.backend.data.model.Friend;
 import com.parrot.backend.entities.User;
 import com.parrot.backend.services.fileUpload.IFileUploadService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -13,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
@@ -38,35 +41,35 @@ public class UserService implements IUserService {
   }
 
   public UserResponse findByEmail(String email) {
-    var user = userRepository.findUserByEmail(email).orElseThrow(() -> new NotFoundException("User not found"));
+    var user = getUser(email);
 
-    return new UserResponse(user.getId(), user.getName(), user.getEmail(), user.getPhotoUrl());
+    return new UserResponse(user);
   }
 
   public UserResponse findById(UUID id) {
-    var user = userRepository.findById(id).orElseThrow(() -> new NotFoundException("User not found"));
+    var user = getUserById(id);
 
-    return new UserResponse(user.getId(), user.getName(), user.getEmail(), user.getPhotoUrl());
+    return new UserResponse(user);
   }
 
   public List<UserResponse> findAll() {
-    return userRepository.findAllUsers();
+    return userRepository.findAll().stream().map(UserResponse::new).toList();
   }
 
   @Transactional
   public UserResponse update(UUID id, UpdateUserRequest request) {
-    var user = userRepository.findById(id).orElseThrow(() -> new NotFoundException("User not found"));
+    var user = getUserById(id);
     if(request.getName() != null) user.setName(request.name);
     if(request.getPassword() != null) user.setPassword(request.password);
 
     userRepository.save(user);
 
-    return new UserResponse(user.getId(), user.getName(), user.getEmail(), user.getPhotoUrl());
+    return new UserResponse(user);
   }
 
   @Transactional
   public void delete(UUID id) {
-    findById(id);
+    getUserById(id);
     userRepository.deleteById(id);
   }
 
@@ -85,11 +88,69 @@ public class UserService implements IUserService {
     userRepository.save(user);
   }
 
+  @Transactional
+  public void follow(UUID id) {
+    // meu usuario
+    var user = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+    // usuário que quero seguir
+    var userToFollow = getUserById(id);
+
+    // se na minha lista de pessoas que eu sigo
+    // tiver esse userToFollow retornar: você já segue esse usuário
+    if(user.getFollowing().contains(userToFollow.getId())) {
+      throw new DataIntegrityViolationException("You are already following this user");
+    }
+
+    userToFollow.getFollowers().add(user.getId());
+    user.getFollowing().add(userToFollow.getId());
+
+    userRepository.save(userToFollow);
+    userRepository.save(user);
+  }
+
+  @Transactional
+  public void unFollow(UUID id) {
+    // meu usuario
+    var user = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+    // usuário que quero deixar de seguir
+    var userToUnFollow = getUserById(id);
+
+    // se na minha lista de pessoas que eu estou seguind
+    // tiver esse userToUnFollow retornar: User not found
+    if(!user.getFollowing().contains(userToUnFollow.getId())) {
+      throw new NotFoundException("User not found");
+    }
+
+    userToUnFollow.getFollowers().remove(user.getId());
+    user.getFollowing().remove(userToUnFollow.getId());
+
+    userRepository.save(userToUnFollow);
+    userRepository.save(user);
+  }
+
+  public List<Friend> findAllFollowers(UUID userId) {
+    var user = getUserById(userId);
+
+    return userRepository
+        .findAllById(user.getFollowers())
+        .stream().map(Friend::new)
+        .toList();
+  }
+
+  public List<Friend> findAllFollowings(UUID userId) {
+    var user = getUserById(userId);
+
+    return userRepository
+        .findAllById(user.getFollowing())
+        .stream().map(Friend::new)
+        .toList();
+  }
+
   public User getUser(String email) {
-    return userRepository.findUserByEmail(email).get();
+    return userRepository.findUserByEmail(email).orElseThrow(() -> new NotFoundException("User not found"));
   }
 
   public User getUserById(UUID id) {
-    return userRepository.findById(id).get();
+    return userRepository.findById(id).orElseThrow(() -> new NotFoundException("User not found"));
   }
 }
