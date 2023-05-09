@@ -3,6 +3,7 @@ package com.parrot.backend.api;
 import com.parrot.backend.services.authentication.AuthenticateRequest;
 import com.parrot.backend.services.authentication.AuthenticateResponse;
 import com.parrot.backend.services.authentication.IAuthenticationService;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,7 @@ public class AuthenticationController {
   @Autowired
   private IAuthenticationService authenticationService;
 
+  @Operation(summary = "Login")
   @PostMapping("/login")
   public ResponseEntity<AuthenticateResponse> authenticate(@RequestBody AuthenticateRequest request) {
     try {
