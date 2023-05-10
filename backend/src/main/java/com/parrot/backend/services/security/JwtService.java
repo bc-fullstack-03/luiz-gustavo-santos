@@ -28,18 +28,13 @@ public class JwtService implements IJwtService {
   }
 
   public boolean isValidToken(String token, String userId) {
-    var sub = getClaim(token, Claims::getSubject);
     var tokenExpiration = getClaim(token, Claims::getExpiration);
 
-    if (!sub.equals(userId)) {
-      return false;
-    }
+    return !tokenExpiration.before(new Date());
+  }
 
-    if (tokenExpiration.before(new Date())) {
-      return false;
-    }
-
-    return true;
+  public String getTokenSubject(String token) {
+    return getClaim(token, Claims::getSubject);
   }
 
   private <T> T getClaim(String token, Function<Claims, T> claimsResolver) {

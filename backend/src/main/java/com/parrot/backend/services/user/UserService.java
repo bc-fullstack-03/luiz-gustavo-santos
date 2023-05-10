@@ -7,7 +7,6 @@ import com.parrot.backend.data.model.Friend;
 import com.parrot.backend.entities.User;
 import com.parrot.backend.services.fileUpload.IFileUploadService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -15,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
@@ -90,15 +88,12 @@ public class UserService implements IUserService {
 
   @Transactional
   public void follow(UUID id) {
-    // meu usuario
+
     var user = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
-    // usuário que quero seguir
     var userToFollow = getUserById(id);
 
-    // se na minha lista de pessoas que eu sigo
-    // tiver esse userToFollow retornar: você já segue esse usuário
     if(user.getFollowing().contains(userToFollow.getId())) {
-      throw new DataIntegrityViolationException("You are already following this user");
+      throw new UserAlreadyExistsException("You are already following this user");
     }
 
     userToFollow.getFollowers().add(user.getId());
@@ -110,13 +105,10 @@ public class UserService implements IUserService {
 
   @Transactional
   public void unFollow(UUID id) {
-    // meu usuario
+
     var user = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
-    // usuário que quero deixar de seguir
     var userToUnFollow = getUserById(id);
 
-    // se na minha lista de pessoas que eu estou seguind
-    // tiver esse userToUnFollow retornar: User not found
     if(!user.getFollowing().contains(userToUnFollow.getId())) {
       throw new NotFoundException("User not found");
     }

@@ -1,12 +1,13 @@
 package com.parrot.backend.api.exceptions;
 
+import com.parrot.backend.data.model.FieldErrorMessage;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Validation extends ApiException {
+public class Validation extends ErrorResponse {
 
   @Getter
   private List<FieldErrorMessage> errors = new ArrayList<>();

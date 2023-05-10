@@ -1,4 +1,4 @@
-package com.parrot.backend.api.exceptions;
+package com.parrot.backend.data.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

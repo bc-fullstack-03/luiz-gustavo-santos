@@ -2,12 +2,12 @@ package com.parrot.backend.api.exceptions;
 
 import org.springframework.http.HttpStatus;
 
-public class ApiException {
+public class ErrorResponse {
   private final String message;
   private final Throwable throwable;
   private final HttpStatus httpStatus;
 
-  public ApiException(String message, Throwable throwable, HttpStatus httpStatus) {
+  public ErrorResponse(String message, Throwable throwable, HttpStatus httpStatus) {
     this.message = message;
     this.throwable = throwable;
     this.httpStatus = httpStatus;

@@ -21,10 +21,6 @@ public class AuthenticationService implements IAuthenticationService {
     var response = new AuthenticateResponse();
     var token = jwtService.generateToken(user.getId());
 
-    if(user == null) {
-      throw new Exception("Invalid credentials");
-    }
-
     if(!passwordEncoder.matches(request.password, user.getPassword())) {
       throw new Exception("Invalid credentials");
     }

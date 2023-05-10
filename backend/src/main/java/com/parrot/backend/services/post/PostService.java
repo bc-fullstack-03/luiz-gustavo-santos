@@ -1,6 +1,6 @@
 package com.parrot.backend.services.post;
 
-import com.amazonaws.services.mq.model.ForbiddenException;
+import com.parrot.backend.api.exceptions.ForbiddenException;
 import com.parrot.backend.api.exceptions.NotFoundException;
 import com.parrot.backend.data.IPostRepository;
 import com.parrot.backend.data.model.Comment;
@@ -41,7 +41,7 @@ public class PostService implements IPostService {
   }
 
   public List<PostResponse> findAll() {
-    return postRepository.findAllPosts();
+    return postRepository.findAll().stream().map(PostResponse::new).toList();
   }
 
   public PostResponse findById(UUID id) {
@@ -51,7 +51,7 @@ public class PostService implements IPostService {
   }
 
   public List<PostResponse> findByUserId(UUID id) {
-    return postRepository.findByUserId(id);
+    return postRepository.findByUserId(id).stream().map(PostResponse::new).toList();
   }
 
   @Transactional

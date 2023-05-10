@@ -1,10 +1,8 @@
 package com.parrot.backend.services.post;
 
-import com.parrot.backend.data.model.Comment;
 import com.parrot.backend.entities.Post;
 import lombok.Data;
 
-import java.util.List;
 import java.util.UUID;
 
 @Data

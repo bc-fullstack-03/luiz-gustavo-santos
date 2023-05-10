@@ -7,7 +7,7 @@ services:
       - 27017:27017
   localstack:
     image: localstack/localstack
-    container_name: parrot_localstack
+    container_name: parrot-localstack
     ports:
       - 4566:4566
       - 4510-4559:4510-4559
@@ -19,3 +19,11 @@ services:
     volumes:
       - ./tmp/localstack:/tmp/localstack
       - /var/run/docker.sock:/var/run/docker.sock
+#  parrot-app:
+#    image: luizgustavo0/parrot-app:latest
+#    build: .
+#    container_name: parrot-app
+#    environment:
+#      - API_ENV=container
+#    ports:
+#      - 8082:8082
