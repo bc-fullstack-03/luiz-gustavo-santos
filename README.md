@@ -9,7 +9,7 @@ Api de uma rede social desenvolvida em Java com Spring Boot e MongoDB.
 ```shell
 docker pull luizgustavo0/parrot-app
 ```
-após baixar a imagem siga essas intruções de configuração do localstack <a href='#importante'>aqui</a>.
+após baixar a imagem siga as intruções de configuração do localstack <a href='#importante'>aqui</a>.
 
 ### Local
 entre na pasta do projeto
