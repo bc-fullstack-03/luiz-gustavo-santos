@@ -48,3 +48,9 @@ em seguida configure o bucket e o endpoint url
 ```bash
 aws s3 mb s3://parrot-bucket --endpoint-url http://localhost:4566
 ```
+
+## Docmentação
+A documentação da api pode ser acessada em
+```shell
+http://localhost:8082/swagger-ui/index.html
+```
