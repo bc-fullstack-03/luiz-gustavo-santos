@@ -46,15 +46,15 @@ public class AuthenticationFilter extends OncePerRequestFilter {
     }
 
     var token = request.getHeader("Authorization");
-    var userId = request.getHeader("RequestedBy");
 
-    if(token == null || userId == null || !token.startsWith("Bearer ")) {
+    if(token == null || !token.startsWith("Bearer ")) {
       response.getWriter().write("User not authenticated!");
       response.setStatus(HttpStatus.UNAUTHORIZED.value());
       return;
     }
 
-    boolean isValidToken = false;
+    var userId = jwtService.getTokenSubject(token.substring(7));
+    boolean isValidToken;
 
     try {
       isValidToken = jwtService.isValidToken(token.substring(7), userId);

@@ -4,6 +4,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,13 +18,18 @@ public class AwsService {
   @Autowired
   private AmazonS3 amazonS3;
 
+  @Value("${app-config.api-env}")
+  private String apiEnv;
+
   public String upload(MultipartFile file, String fileName) throws Exception {
     var fileUrl = "";
     try {
       var fileConverted = convertMultiPartFile(file);
       amazonS3.putObject(new PutObjectRequest("parrot-bucket", fileName, fileConverted).withCannedAcl(CannedAccessControlList.PublicRead));
 
-      fileUrl = "http://s3.localhost.localstack.cloud:4566"+"/"+"parrot-bucket"+"/"+fileName;
+      fileUrl = apiEnv.equals("local")
+          ? "http://s3.localhost.localstack.cloud:4566"+"/"+"parrot-bucket"+"/"+fileName
+          : "http://localhost:4566"+"/"+"parrot-bucket"+"/"+fileName ;
       fileConverted.delete();
     } catch (Exception e) {
       throw new Exception(e.getMessage());
