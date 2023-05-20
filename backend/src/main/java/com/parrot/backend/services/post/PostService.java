@@ -4,10 +4,14 @@ import com.parrot.backend.api.exceptions.ForbiddenException;
 import com.parrot.backend.api.exceptions.NotFoundException;
 import com.parrot.backend.data.IPostRepository;
 import com.parrot.backend.data.model.Comment;
+import com.parrot.backend.data.model.PaginationResponse;
 import com.parrot.backend.entities.Post;
 import com.parrot.backend.entities.User;
 import com.parrot.backend.services.fileUpload.IFileUploadService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,11 +41,28 @@ public class PostService implements IPostService {
     }
 
     post.setUserId(user.getId());
+    post.setUserName(user.getName());
     postRepository.save(post);
   }
 
-  public List<PostResponse> findAll() {
-    return postRepository.findAll().stream().map(PostResponse::new).toList();
+  public PaginationResponse<PostResponse> findAll(Pageable pageable) {
+
+    if(pageable.getPageNumber() > 0) {
+      var pageWithElements = PageRequest.of(pageable.getPageNumber() - 1, 10);
+
+      Page<Post> page = postRepository.findAll(pageWithElements);
+
+      PaginationResponse<PostResponse> response = new PaginationResponse<>();
+      response.setContent(page.getContent().stream().map(PostResponse::new).toList());
+      response.setPageNumber(page.getNumber() + 1);
+      response.setPageSize(page.getSize());
+      response.setTotalElements(page.getTotalElements());
+      response.setTotalPages(page.getTotalPages());
+
+      return response;
+    }
+
+    return null;
   }
 
   public PostResponse findById(UUID id) {

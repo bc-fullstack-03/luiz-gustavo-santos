@@ -1,9 +1,12 @@
 package com.parrot.backend.api;
 
+import com.parrot.backend.data.model.PaginationResponse;
 import com.parrot.backend.services.post.*;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -35,8 +38,8 @@ public class PostController {
 
   @Operation(summary = "Find all posts")
   @GetMapping
-  public ResponseEntity<List<PostResponse>> findAll() {
-    return ResponseEntity.ok().body(postService.findAll());
+  public ResponseEntity<PaginationResponse<PostResponse>> findAll(Pageable page) {
+    return ResponseEntity.ok().body(postService.findAll(page));
   }
 
   @Operation(summary = "Find post by id")
