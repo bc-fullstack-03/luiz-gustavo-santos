@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,8 +49,8 @@ public class PostService implements IPostService {
   public PaginationResponse<PostResponse> findAll(Pageable pageable) {
 
     if(pageable.getPageNumber() > 0) {
-      var pageWithElements = PageRequest.of(pageable.getPageNumber() - 1, 10);
-
+      Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
+      var pageWithElements = PageRequest.of(pageable.getPageNumber() - 1, 10, sort);
       Page<Post> page = postRepository.findAll(pageWithElements);
 
       PaginationResponse<PostResponse> response = new PaginationResponse<>();
@@ -58,7 +59,6 @@ public class PostService implements IPostService {
       response.setPageSize(page.getSize());
       response.setTotalElements(page.getTotalElements());
       response.setTotalPages(page.getTotalPages());
-
       return response;
     }
 
@@ -116,7 +116,7 @@ public class PostService implements IPostService {
     if(post.getComments() == null) {
       post.setComments(new ArrayList<>());
     }
-    var comment = new Comment(request.comment, user.getId());
+    var comment = new Comment(request.comment, user.getId(), user.getName());
 
     post.getComments().add(comment);
     postRepository.save(post);
@@ -126,6 +126,10 @@ public class PostService implements IPostService {
 
   public List<CommentResponse> findAllCommentsByPost(UUID postId) {
     var post = postRepository.findById(postId).orElseThrow(() -> new NotFoundException("Post not found"));
+
+    if(post.getComments() == null) {
+      return new ArrayList<>();
+    }
 
     return post.getComments().stream().map(CommentResponse::new).toList();
   }

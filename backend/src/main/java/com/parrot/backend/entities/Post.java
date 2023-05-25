@@ -1,7 +1,6 @@
 package com.parrot.backend.entities;
 
 import com.parrot.backend.data.model.Comment;
-import com.parrot.backend.data.model.Friend;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 

@@ -1,9 +1,12 @@
 package com.parrot.backend.services.post;
 
+import com.parrot.backend.data.model.Comment;
 import com.parrot.backend.entities.Post;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -13,8 +16,8 @@ public class PostResponse {
   public String image;
   public UUID userId;
   public String userName;
-  public Integer comments;
-  public Integer likes;
+  public List<Comment> comments;
+  public List<UUID> likes;
   public LocalDateTime createdAt;
   public LocalDateTime updatedAt;
 
@@ -24,8 +27,8 @@ public class PostResponse {
     this.image = post.getImage();
     this.userId = post.getUserId();
     this.userName = post.getUserName();
-    this.comments = post.getComments() == null ? 0 : post.getComments().size();
-    this.likes = post.getLikes() == null ? 0 : post.getLikes().size();
+    this.comments = post.getComments() == null ? new ArrayList<>() : post.getComments();
+    this.likes = post.getLikes() == null ? new ArrayList<>() : post.getLikes();
     this.createdAt = post.getCreatedAt();
     this.updatedAt = post.getUpdatedAt();
   }
