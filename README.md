@@ -20,8 +20,6 @@ execute os comandos a seguir
 ```shell
 mvn install 
 
-docker-compose build
-
 docker-compose up -d
 ```
 
@@ -42,6 +40,7 @@ adicione as seguites configurações
 ```bash
 key: mykey
 secretKey: mykey
+region: us-west-2
 output: json
 ```
 em seguida configure o bucket e o endpoint url
