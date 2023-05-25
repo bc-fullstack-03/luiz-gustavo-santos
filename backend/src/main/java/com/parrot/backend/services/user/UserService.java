@@ -27,7 +27,7 @@ public class UserService implements IUserService {
 
   @Transactional
   public void create(CreateUserRequest request) {
-    if(userRepository.findUserByEmail(request.email).isPresent()) {
+    if (userRepository.findUserByEmail(request.email).isPresent()) {
       throw new UserAlreadyExistsException("User already exists");
     }
 
@@ -57,8 +57,8 @@ public class UserService implements IUserService {
   @Transactional
   public UserResponse update(UUID id, UpdateUserRequest request) {
     var user = getUserById(id);
-    if(request.getName() != null) user.setName(request.name);
-    if(request.getPassword() != null) user.setPassword(request.password);
+    if (request.getName() != null) user.setName(request.name);
+    if (request.getPassword() != null) user.setPassword(request.password);
 
     userRepository.save(user);
 
@@ -92,7 +92,7 @@ public class UserService implements IUserService {
     var user = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
     var userToFollow = getUserById(id);
 
-    if(user.getFollowing().contains(userToFollow.getId())) {
+    if (user.getFollowing().contains(userToFollow.getId())) {
       throw new UserAlreadyExistsException("You are already following this user");
     }
 
@@ -109,7 +109,7 @@ public class UserService implements IUserService {
     var user = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
     var userToUnFollow = getUserById(id);
 
-    if(!user.getFollowing().contains(userToUnFollow.getId())) {
+    if (!user.getFollowing().contains(userToUnFollow.getId())) {
       throw new NotFoundException("User not found");
     }
 
